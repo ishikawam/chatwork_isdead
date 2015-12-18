@@ -26,7 +26,7 @@ $status_code = array_pop($matches[1]); // リダイレクトとかされる場�
 
 if (!$res || $status_code != 200) {
     tweet('チャットワークは死んだ', 'page');
-} else if (!preg_match('|<h1>Login</h1>|', $res)) {
+} else if (preg_match('|<h2 class="new-theme_section__title">Log in with email address</h2>|', $res) === false) {
     tweet('チャットワークは死んだかもしれない', 'page');
 } else {
     tweet('チャットワークは蘇った！！！', 'page');
@@ -75,4 +75,8 @@ function tweet($message, $type = '') {
 
 //    return; // for debug
     $req = $connection->OAuthRequest('https://api.twitter.com/1.1/statuses/update.json', 'POST', array('status' => $message ));
+
+    // ついでに自分にメール
+    mb_internal_encoding('UTF-8');
+    mb_send_mail('ishikawam@nifty.com', $message, $message . "\n\nhttps://twitter.com/chatwork_isdead\n");
 }
