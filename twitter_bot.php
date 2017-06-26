@@ -14,7 +14,9 @@ $context = stream_context_create(
 require('config.php');
 $config = Config::getConfig();
 
-// Chatworkをチェック
+/********************************************************/
+
+// Chatwork KDDI版をチェック
 $res = file_get_contents('https://kcw.kddi.ne.jp', false, $context);
 // 200で'<h1>ログイン</h1>'があれば正常としておく
 
@@ -23,13 +25,31 @@ file_put_contents(dirname(__FILE__) . '/tmp/content_page', $res);
 
 preg_match_all('/^HTTP\/[^ ]+ ([0-9]{3})/m', implode("\n" ,$http_response_header), $matches);
 $status_code = array_pop($matches[1]); // リダイレクトとかされる場合もあるので最後のstatusを取る
-
 if (!$res || $status_code != 200) {
-    tweet('チャットワークは死んだ', 'page');
+    tweet('チャットワーク(KDDI版)は死んだ', 'page');
 } else if (preg_match('|<h2 class="new-theme_section__title">Log in with email address</h2>|', $res) === false) {
-    tweet('チャットワークは死んだかもしれない', 'page');
+    tweet('チャットワーク(KDDI版)は死んだかもしれない', 'page');
 } else {
-    tweet('チャットワークは蘇った！！！', 'page');
+    tweet('チャットワーク(KDDI版)は蘇った！！！', 'page');
+}
+
+/********************************************************/
+
+// Chatwork本家をチェック
+$res = file_get_contents('https://www.chatwork.com', false, $context);
+// 200で'<h1>ログイン</h1>'があれば正常としておく
+
+file_put_contents(dirname(__FILE__) . '/tmp/res_header_www', print_r($http_response_header, true));
+file_put_contents(dirname(__FILE__) . '/tmp/content_www', $res);
+
+preg_match_all('/^HTTP\/[^ ]+ ([0-9]{3})/m', implode("\n" ,$http_response_header), $matches);
+$status_code = array_pop($matches[1]); // リダイレクトとかされる場合もあるので最後のstatusを取る
+if (!$res || $status_code != 200) {
+    tweet('チャットワークは死んだ', 'www');
+} else if (preg_match('|<h2 class="new-theme_section__title">Log in with email address</h2>|', $res) === false) {
+    tweet('チャットワークは死んだかもしれない', 'www');
+} else {
+    tweet('チャットワークは蘇った！！！', 'www');
 }
 
 /********************************************************/
